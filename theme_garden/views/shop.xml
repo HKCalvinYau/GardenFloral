@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="assets_predictive_search" inherit_id="website_sale.assets_frontend">
+      <xpath expr="//script[last()]" position="after">
+         <script type="text/javascript" src="/theme_garden/static/src/js/444.js"/>
+      </xpath>
+   </template>
+
+    <!-- Add our own search bar -->
+    <template id="website_sale_products_search_box_garden" inherit_id="website_sale.website_sale_products_search_box">
+        <xpath expr="//form" position="replace">
+            <form t-attf-class="o_wsale_products_searchbar_form_garden o_wait_lazy_js #{_classes}" t-att-action="action if action else '/shop'" method="get" t-att-data-snippet="_snippet">
+                <t>$0</t>
+                <input name="order" type="hidden" class="o_wsale_search_order_by" value=""/>
+                <t t-raw="0"/>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="products_item_custom" inherit_id="website_sale.products_item">
+      <xpath expr="//form" position="replace">
+
+         <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-rating.css?v=2457308526394124043" rel="stylesheet" type="text/css" media="all" />
+         <t t-set="product_href" t-value="keep(product.website_url, page=(pager['page']['num'] if pager['page']['num']&gt;1 else None))" />
+        <t t-set="combination_info" t-value="product._get_combination_info(only_template=True, add_qty=add_qty or 1, pricelist=pricelist)" />
+      
+         <div t-att-data-publish="product.website_published and 'on' or 'off'" itemscope="itemscope" itemtype="http://schema.org/Product">
+            <div class="card-wrapper">
+               <a t-att-href="product.website_url" class="full-unstyled-link" style="text-decoration: none;">
+                  <span class="visually-hidden">
+                     <t t-esc="product.name" />
+                  </span>
+                  <div class="card card--product card--outline" tabindex="-1">
+                     <div class="card__inner">
+                        <div>
+                           <div class="media media--transparent media--adapt media--hover-effect" style="padding-bottom: 100.0%;">
+                              <img t-attf-src="/web/image/product.template/#{product.id}/image_1024" loading="lazy" class="motion-reduce" width="1080" height="1080" />
+                              <!--<img srcset="//cdn.shopify.com/s/files/1/0600/5473/2985/products/2_165x.png?v=1644217867 165w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/2_360x.png?v=1644217867 360w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/2_533x.png?v=1644217867 533w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/2_720x.png?v=1644217867 720w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/2_940x.png?v=1644217867 940w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/2_1066x.png?v=1644217867 1066w" src="//cdn.shopify.com/s/files/1/0600/5473/2985/products/2_533x.png?v=1644217867" sizes="(min-width: 1600px) 367px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" alt="1314情人節套餐" loading="lazy" class="motion-reduce" width="1080" height="1080" /> -->
+                           </div>
+                        </div>
+                        <div class="card__badge" />
+                     </div>
+                  </div>
+                  <div class="card-information">
+                     <div class="card-information__wrapper">
+                        <span class="card-information__text h5">
+                           <t t-esc="product.name" />
+                        </span>
+                        <span class="caption-large light" />
+                        <div class="price ">
+                           <dl>
+                              <div class="price__sale" style="display: inherit;">
+                                 <t t-if="product.regular_price">
+                                    <dt class="price__compare">
+                                       <span class="visually-hidden visually-hidden--inline">Regular price</span>
+                                    </dt>
+                                    <dd class="price__compare">
+                                       <s class="price-item price-item--regular">
+                                          <t t-esc="product.currency_id.symbol" />
+                                          <t t-esc="product.regular_price" />
+                                       </s>
+                                    </dd>
+                                 </t>
+                                 <dt>
+                                    <span class="visually-hidden visually-hidden--inline">Sale price</span>
+                                 </dt>
+                                 <dd>
+                                    <span class="price-item price-item--sale">
+                                       <t t-if="product.product_variant_count &gt; 1">
+                                          From
+                                          <t t-esc="product.currency_id.symbol" />
+                                          <t t-esc="product.list_price" />
+                                       </t>
+                                       <t t-else="">
+                                          <t t-esc="product.currency_id.symbol" />
+                                          <t t-esc="product.list_price" />
+                                       </t>
+                                    </span>
+                                 </dd>
+                              </div>
+                              <small class="unit-price caption hidden">
+                                 <dt class="visually-hidden">Unit price</dt>
+                                 <dd>
+                                    <span />
+                                    <span aria-hidden="true">/</span>
+                                    <span class="visually-hidden">per</span>
+                                    <span />
+                                 </dd>
+                              </small>
+                           </dl>
+                        </div>
+                     </div>
+                  </div>
+               </a>
+            </div>
+         </div>
+      </xpath>
+   </template>
+
+    
+   <template id="products_grid_custom" inherit_id="website_sale.products" priority="2">
+
+    <xpath expr="//div[@id='products_grid_before']" position="attributes">
+        <attribute name="class">col-lg-2</attribute>
+    </xpath>
+
+                        
+    <xpath expr="//div[hasclass('products_pager')]/t" position="replace">
+        <t t-set="action" t-value="keep('/shop'+ ('/category/'+slug(category)) if category else None, search=0)"/>
+
+        <form t-attf-class="o_wsale_products_searchbar_form_garden w-100 w-md-auto mt-2" t-att-action="action if action else '/shop'" method="get" t-att-data-snippet="_snippet">
+            <div role="search" class="field" style="height: 3.5rem;"> 
+                <input class="search-query search__input field__input" style="height: 3.5rem;" id="Search-In-Modal" type="search" name="search" value="" placeholder="Search..."  aria-expanded="false" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false" aria-activedescendant="" data-limit="5" data-display-description="true" data-display-price="true" data-display-image="true" />
+                <label class="field__label" style="top: 0.5rem;" for="Search-In-Modal">Search</label>
+                <input type="hidden" name="options[prefix]" value="last" />
+                <button type="submit" class="search__button field__button" style="top: -0.6rem;" aria-label="Search">
+                    <svg class="icon icon-search" aria-hidden="true" focusable="false" role="presentation">
+                        <i class="material-icons" style="font-size:26px; margin-top: 5px;margin-left: -15px;">search</i>
+                    </svg>
+                </button> 
+            </div>
+            <input name="order" type="hidden" class="o_wsale_search_order_by" value=""/>    
+         </form>
+    </xpath>
+
+    <xpath expr="//div[hasclass('container')]" position="after">
+        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/template-collection.css?v=6595738038178392633" rel="stylesheet" type="text/css" media="all" />
+        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-loading-overlay.css?v=8507244000641785207" rel="stylesheet" type="text/css" media="all" />
+        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-card.css?v=9252431989618201249" rel="stylesheet" type="text/css" media="all" />
+        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-price.css?v=18355640432874979228" rel="stylesheet" type="text/css" media="all" />
+        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-product-grid.css?v=5354882172846634645" rel="stylesheet" type="text/css" media="all" />
+        <link rel="stylesheet" href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-rte.css?v=8404376346561933237" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+
+        <noscript>
+            <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-rte.css?v=8404376346561933237" rel="stylesheet" type="text/css" media="all" />
+        </noscript>
+
+      </xpath> 
+    
+      <xpath expr="//tbody" position="replace">
+        <tbody>
+         <tr t-foreach="bins" t-as="tr_product">
+            <t t-foreach="tr_product" t-as="td_product">
+                <t t-if="td_product">
+                    <t t-set="product" t-value="td_product['product']" />
+                        <!-- We use t-attf-class here to allow easier customization -->
+                         <td style="padding: 7px 7px;" t-att-colspan="td_product['x'] != 1 and td_product['x']"
+                            t-att-rowspan="td_product['y'] != 1 and td_product['y']"
+                            t-attf-class="oe_product"
+                            t-att-data-ribbon-id="td_product['ribbon'].id">
+                             <div t-attf-class="o_wsale_product_grid_wrapper_#{td_product['x']}_#{td_product['y']}">
+                                <t t-call="website_sale.products_item">
+                                <t t-set="product_image_big" t-value="td_product['x'] + td_product['y'] &gt; 2" />
+                                </t>
+                            </div>
+                        </td>
+                    </t>
+                <td t-else=""/>
+            </t>
+         </tr>
+         </tbody>
+      </xpath>
+
+
+
+   </template>
+
+    <template id="show_collections_products" inherit_id="website_sale.products" priority="50" active="True" customize_show="True" name="Top Collections">
+         <xpath expr="//div[hasclass('container')]" position="after">
+               <t t-set="garden_config" t-value="request.env['garden.config'].search([])" />
+               <t t-set="category_data" t-value="garden_config.get_top_3_collections()" />
+               <t t-call="theme_garden.top_collections" />
+               <br />
+         </xpath>
+    </template>
+
+    <template id="show_blog_posts" inherit_id="website_sale.products" priority="20" active="True" customize_show="True" name="Blog Posts">
+         <xpath expr="//div[hasclass('container')]" position="after">
+              <t t-call="theme_garden.blog_featured" />
+              <br />
+         </xpath>
+    </template>
+
+
+
+   
+   <template id="product_information" inherit_id="website_sale.product" priority="99" active="True" customize_show="True" name="Shopify Style Product Info">
+
+      <!--Remove search -->
+      <xpath expr="//div[hasclass('row')]/div[2]" position="replace">
+      </xpath>
+
+      <xpath expr="//div[@id='product_details']" position="replace">
+         <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/section-main-product.css?v=1392002280200776523" rel="stylesheet" type="text/css" media="all" />
+         <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-accordion.css?v=15509347209324361729" rel="stylesheet" type="text/css" media="all" />
+         <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-price.css?v=18355640432874979228" rel="stylesheet" type="text/css" media="all" />
+         <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-rte.css?v=8404376346561933237" rel="stylesheet" type="text/css" media="all" />
+         <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-slider.css?v=8200683548770782072" rel="stylesheet" type="text/css" media="all" />
+         <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-rating.css?v=2457308526394124043" rel="stylesheet" type="text/css" media="all" />
+         <link rel="stylesheet" href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-deferred-media.css?v=17118019895967142225" media="all" onload="this.media='all'" />
+         
+         <t t-set="garden_config" t-value="request.env['garden.config'].search([])" />
+
+         <div class="col-md-6 col-xl-4" id="product_details">
+         <div id="ProductInfo-template--15058976735417__main" class="product__info-container product__info-container--sticky">
+            <p class="product__text caption-with-letter-spacing">Gardenia Floral Studio</p>
+            <!--Company Website Name-->
+            <h1 itemprop="name" t-field="product.name" class="product__title" />
+            <p class="product__text subtitle" />
+            <!-- 
+            <span class="badge price__badge-sale color-accent-2" aria-hidden="true">Sale</span>
+            <span class="badge price__badge-sold-out color-inverse" aria-hidden="true">Sold out</span>
+            -->
+            <!-- 
+            <div>
+               <form method="post" action="/cart/add" id="product-form-installment" accept-charset="UTF-8" class="installment caption-large" enctype="multipart/form-data">
+                  <input type="hidden" name="form_type" value="product" />
+                  <input type="hidden" name="utf8" value="✓" />
+                  <input type="hidden" name="id" value="41082794115257" />
+               </form>
+            </div>
+            -->
+            <form t-if="product._is_add_to_cart_possible()" action="/shop/cart/update" method="POST">
+               <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+               <div class="js_product js_main_product">
+                  <t t-placeholder="select">
+                     <input type="hidden" class="product_id" name="product_id" t-att-value="product_variant.id" />
+                     <input type="hidden" class="product_template_id" name="product_template_id" t-att-value="product.id" />
+                     <t t-if="combination">
+                        <t t-set="ul_class" t-value="'flex-column'" />
+                        <t t-set="parent_combination" t-value="None" />
+                        <t t-set="attribute_exclusions" t-value="product._get_attribute_exclusions(parent_combination, parent_name)" />
+                        <ul t-attf-class="list-unstyled js_add_cart_variants #{ul_class}" t-att-data-attribute_exclusions="json.dumps(attribute_exclusions)">
+                           <variant-radios class="no-js-hidden" data-section="template--15058976735417__main" t-att-data-url="product.website_url">
+                              <t t-foreach="product.valid_product_template_attribute_line_ids" t-as="ptal">
+                                 <fieldset class="js product-form__input"> <!--  -->
+                                    <!-- Attributes selection is hidden if there is only one value available and it's not a custom value -->
+                                    <!-- each attribute -->
+                                    <li t-att-data-attribute_id="ptal.attribute_id.id" t-att-data-attribute_name="ptal.attribute_id.name" t-attf-class="variant_attribute #{'d-none' if len(ptal.product_template_value_ids._only_active()) == 1 and not ptal.product_template_value_ids._only_active()[0].is_custom else ''}">
+                                       <!-- Used to customize layout if the only available attribute value is custom -->
+                                       <t t-set="single" t-value="len(ptal.product_template_value_ids._only_active()) == 1" />
+                                       <t t-set="single_and_custom" t-value="single and ptal.product_template_value_ids._only_active()[0].is_custom" />
+                                       <!-- <strong t-field="ptal.attribute_id.name" class="attribute_name"/> -->
+                                       <legend class="form__label">
+                                          <t t-esc="ptal.attribute_id.name" />
+                                       </legend>
+                                       <t t-if="ptal.attribute_id.display_type == 'radio'">
+                                          <ul t-att-data-attribute_id="ptal.attribute_id.id" t-attf-class="list-unstyled #{'d-none' if single_and_custom else ''}" style="display: inline-flex;">
+                                             <t t-foreach="ptal.product_template_value_ids._only_active()" t-as="ptav">
+                                                <li class="js_attribute_value" style="margin: 0;">
+                                                   <!--Form group -->
+                                                   <div>
+                                                         <input type="radio" t-att-id="ptav.id" t-attf-class="js_variant_change radio_input #{ptal.attribute_id.create_variant}" t-att-checked="ptav in combination" t-att-name="'ptal-%s' % ptal.id" t-att-value="ptav.id" t-att-data-value_id="ptav.id" t-att-data-value_name="ptav.name" t-att-data-attribute_name="ptav.attribute_id.name" t-att-data-is_custom="ptav.is_custom" t-att-data-is_single="single" t-att-data-is_single_and_custom="single_and_custom" />
+                  
+                                                         <label t-att-for="ptav.id" class="radio_input_value">
+                                                            <span t-field="ptav.name" />
+                                                            <span class="badge badge-pill badge-secondary" t-if="ptav.price_extra">
+                                                               <!-- see note above about price_extra -->
+                                                               <t t-esc="ptav.price_extra &gt; 0 and '+' or '-'" />
+                                                               <span t-esc="abs(ptav.price_extra)" class="variant_price_extra" style="white-space: nowrap;" t-options="{                                                             &quot;widget&quot;: &quot;monetary&quot;,                                                             &quot;from_currency&quot;: product.currency_id,                                                             &quot;display_currency&quot;: (pricelist or product).currency_id                                                         }" />
+                                                            </span>
+                                                      
+                                                         </label>
+                                                      
+                                                   </div>
+                                                </li>
+                                             </t>
+                                          </ul>
+                                       </t>
+                                    </li>
+                                 </fieldset>
+                              </t>
+                           </variant-radios>
+                        </ul>
+                     </t>
+                     <t t-else="">
+                        <ul class="d-none js_add_cart_variants" t-att-data-attribute_exclusions="{'exclusions: []'}" />
+                     </t>
+                  </t>
+                  <t t-call="theme_garden.product_price" />
+                  <p t-if="True" class="css_not_available_msg alert alert-warning">This combination does not exist.</p>
+                  <div class="product-form__input product-form__quantity" contenteditable="false"> 
+                     <br />
+
+                     <label class="form__label" >Quantity</label>
+                     <quantity-input class="quantity">
+                         <div class="css_quantity input-group" contenteditable="false">
+                           <div class="input-group-prepend">
+                                 <a t-attf-href="#" class="btn quantity__button js_add_cart_json" aria-label="Remove one" title="Remove one">
+                                    <i class="fa fa-minus"></i>
+                                 </a>
+                              </div>
+                              <input type="text" class="quantity__input quantity" data-min="1" name="add_qty" t-att-value="add_qty or 1"/>
+                              <div class="input-group-append">
+                                 <a t-attf-href="#" class="btn quantity__button float_left js_add_cart_json" aria-label="Add one" title="Add one">
+                                    <i class="fa fa-plus"></i>
+                                 </a>
+                              </div>
+                        </div>
+                     </quantity-input>
+
+                  </div>
+
+                  <!-- Messages -->
+                  <div id="infiniteoptions-container">
+                     <div>
+                        <div class="spb-label-tooltip">
+                           <label for="infinite_options_1-0-0" class="spb-productdescfont spb-productdesctextcolor">Gift Card Message</label>
+                        </div>
+                        <span>
+                           <input type="text" name="gift_card_message" id="infinite_options_1-0-0" class="spb-productdescfont spb-productoptiontextcolor spb-productoptionbackground" placeholder="Message print on Gift Card" />
+                        </span>
+                     </div>
+                     <div>
+                        <div class="spb-label-tooltip"><label for="infinite_options_2-0-1" class="spb-productdescfont spb-productdesctextcolor">Delivery Remark</label></div>
+                        <span>
+                           <input type="text" name="delivery_remark" id="infinite_options_2-0-1" class="spb-productdescfont spb-productoptiontextcolor spb-productoptionbackground" />
+                        </span>
+                     </div>
+                  </div>
+
+                  <!-- Buttons -->
+                  <div class="product-form__buttons">
+                     <br />
+                     <a role="button" id="add_to_cart" class="btn product-form__submit button button--full-width button--secondary js_check_product a-submit" href="#">
+                        <i class="fa fa-shopping-cart" />
+                        Add to Cart
+                     </a>
+                     <div data-shopify="payment-button" data-has-selling-plan="false" class="shopify-payment-button" >
+                        <a role="button" id="buy_now" class="btn button shopify-payment-button__button shopify-payment-button__button--unbranded" href="#" style="width: 100%;line-height: revert;"><i class="fa fa-bolt"/> Buy Now</a>
+                     </div>
+                  </div>
+                  
+                  
+                  <div id="product_option_block" />
+
+               </div>
+            </form>
+            <p t-elif="not product.active" class="alert alert-warning">This product is no longer available.</p>
+            <p t-else="" class="alert alert-warning">This product has no valid combination.</p>
+            <hr t-if="product.description_sale" />
+            <div>
+               <p t-field="product.description_sale" class="text-muted mt-3" placeholder="A short description that will also appear on documents." />
+               <div id="product_attributes_simple">
+                  <hr t-if="sum([(1 if len(l.value_ids)==1 else 0) for l in product.attribute_line_ids])" />
+                  <p class="text-muted">
+                     <t t-set="single_value_attributes" t-value="product.valid_product_template_attribute_line_ids._prepare_single_value_for_display()" />
+                     <t t-foreach="single_value_attributes" t-as="attribute">
+                        <span t-field="attribute.name" />
+                        :
+                        <t t-foreach="single_value_attributes[attribute]" t-as="ptal">
+                           <span t-field="ptal.product_template_value_ids._only_active().name" />
+                           <t t-if="not ptal_last">,</t>
+                        </t>
+                        <br />
+                     </t>
+                  </p>
+               </div>
+            </div>
+            <hr />
+         </div>
+         </div>
+      </xpath>
+   </template>
+
+
+   <template id="product_price">
+      <div itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer" class="product_price mt16">
+          <p class="price css_editable_mode_hidden" style="font-weight: 480;font-size: 2rem;">
+              <span t-attf-class="text-danger oe_default_price {{'' if combination_info['has_discounted_price'] else 'd-none'}}" style="text-decoration: line-through; white-space: nowrap;"
+                  t-esc="combination_info['list_price']" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"
+              />
+              <b class="oe_price" style="white-space: nowrap;" t-esc="combination_info['price']" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+              <span itemprop="price" style="display:none;" t-esc="combination_info['price']"/>
+              <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/>
+          </p>
+          <p class="css_non_editable_mode_hidden decimal_precision" t-att-data-precision="str(website.currency_id.decimal_places)">
+            <span t-field="product.list_price"
+                t-options='{
+                   "widget": "monetary",
+                   "display_currency": product.currency_id,
+               }'/>
+          </p>
+      </div>
+    </template>
+
+
+
+    <template id="top_collections" name="Top 3 Collections">
+      <section id="shopify-section-template--15058976768185__1631532587d3dd3305" class="shopify-section spaced-section collection-list-section">
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/section-collection-list.css?v=11813327385407249073" rel="stylesheet" type="text/css" media="all" />
+                     <link rel="stylesheet" href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-slider.css?v=8200683548770782072" media="all" onload="this.media='all'" />
+                     <noscript>
+                        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-slider.css?v=8200683548770782072" rel="stylesheet" type="text/css" media="all" />
+                     </noscript>
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-card.css?v=9252431989618201249" rel="stylesheet" type="text/css" media="all" />
+                     <div class="collection-list-wrapper page-width no-mobile-link">
+                        <div class="title-wrapper-with-link title-wrapper--self-padded-mobile">
+                           <h2 class="collection-list-title">Collections</h2>
+                        </div>
+                        <slider-component class="slider-mobile-gutter">
+                           <ul class="collection-list grid grid--1-col grid--3-col-tablet collection-list--3-items negative-margin--small" id="Slider-template--15058976768185__1631532587d3dd3305" role="list">
+                              <t t-set="category_data" t-value="garden_config.get_top_3_collections()" />
+                              <t t-foreach="category_data" t-as="item">
+                                 <li class="collection-list__item grid__item">
+                                 <a t-att-href="item.get_category_url()" class="card animate-arrow link card--media card--light-border" style="text-decoration: none;">
+                                    <div class="card--stretch card-colored color-background-1">
+                                          <div>
+                                             <div class="media media--square media--hover-effect overflow-hidden">
+                                                <t t-if="category_data[item]">
+                                                      <img t-attf-src="/web/image/product.template/#{category_data[item].id}/image_1024" sizes="(min-width: 1600px) 500px,(min-width: 750px) calc((100vw - 10rem) / 2),calc(100vw - 3rem)" alt="CNY 2022" height="2160" width="2160" loading="lazy" class="motion-reduce" />
+                                                </t>
+                                                <t t-else="">
+                                                      <img t-attf-src="/web/image/product.template//image_1024" sizes="(min-width: 1600px) 500px,(min-width: 750px) calc((100vw - 10rem) / 2),calc(100vw - 3rem)" alt="CNY 2022" height="2160" width="2160" loading="lazy" class="motion-reduce" />
+                                                </t>
+                                             </div>
+                                          </div>
+                                          <div class="card__text card__text-spacing card-colored card__text-hover color-background-1">
+                                             <div class="overlay-card" />
+                                             <h3>
+                                             <t t-esc="item.name" />
+                                             <span class="icon-wrap">
+                                                
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 10" fill="none" aria-hidden="true" focusable="false" role="presentation" class="icon icon-arrow">
+                                                      <path fill-rule="evenodd" clip-rule="evenodd" d="M8.537.808a.5.5 0 01.817-.162l4 4a.5.5 0 010 .708l-4 4a.5.5 0 11-.708-.708L11.793 5.5H1a.5.5 0 010-1h10.793L8.646 1.354a.5.5 0 01-.109-.546z" fill="currentColor" />
+                                                </svg>
+                                             </span>
+                                             </h3>
+                                          </div>
+                                    </div>
+                                 </a>
+                                 </li>
+                              </t>
+                           
+                           </ul>
+                        </slider-component>
+                     </div>
+                  </section>
+    </template>
+
+       
+      
+      
+
+      <template id="featured_collection" name="Featured Collection">
+                  <t t-set="category_data" t-value="garden_config.get_featured_collection()" />
+                  <t t-foreach="category_data" t-as="item">
+                     <section id="shopify-section-template--15058976768185__featured_products" class="shopify-section spaced-section">
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-card.css?v=9252431989618201249" rel="stylesheet" type="text/css" media="all" />
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-price.css?v=18355640432874979228" rel="stylesheet" type="text/css" media="all" />
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-product-grid.css?v=5354882172846634645" rel="stylesheet" type="text/css" media="all" />
+                     <link rel="stylesheet" href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-slider.css?v=8200683548770782072" media="all" onload="this.media='all'" />
+                     <link rel="stylesheet" href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/template-collection.css?v=6595738038178392633" media="all" onload="this.media='all'" />
+                     <noscript>
+                        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-slider.css?v=8200683548770782072" rel="stylesheet" type="text/css" media="all" />
+                     </noscript>
+                     <noscript>
+                        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/template-collection.css?v=6595738038178392633" rel="stylesheet" type="text/css" media="all" />
+                     </noscript>
+                     <div class="collection page-width">
+                        <div class="title-wrapper-with-link">
+                           <h2 class="title"> Featured Collection</h2>
+                        </div>
+                        <slider-component class="slider-mobile-gutter">
+                           <ul class="grid grid--2-col product-grid grid--2-col-tablet grid--4-col-desktop negative-margin--small" role="list">
+                              <t t-foreach="category_data[item]" t-as="product">
+                                 <li class="grid__item">
+                                    <!-- <t t-set="product_href" t-value="/shop" /> t-att-href="/shop" -->
+                                    <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-rating.css?v=2457308526394124043" rel="stylesheet" type="text/css" media="all" />
+                                    <div class="card-wrapper">
+                                       <a t-att-href="product.website_url" class="full-unstyled-link" style="text-decoration: none;">
+                                          <span class="visually-hidden"><t t-esc="product.name" /></span>
+                                           
+                                          <div class="card card--product card--outline" tabindex="-1">
+                                             <div class="card__inner">
+                                                <div>
+                                                   <div class="media media--transparent media--square media--hover-effect">
+                                                      <!--
+                                                         <img srcset="//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_165x.png?v=1642158488 165w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_360x.png?v=1642158488 360w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_533x.png?v=1642158488 533w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_720x.png?v=1642158488 720w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_940x.png?v=1642158488 940w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_1066x.png?v=1642158488 1066w" src="//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_533x.png?v=1642158488" sizes="(min-width: 1600px) 367px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" alt="My Dearest" loading="lazy" class="motion-reduce" width="2160" height="2160" />
+                                                      -->
+                                                      
+                                                         <img t-attf-src="/web/image/product.template/#{product.id}/image_1024" sizes="(min-width: 1600px) 367px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" alt="My Dearest" loading="lazy" class="motion-reduce" width="2160" height="2160" />
+
+                                                      <!--
+                                                      <t t-set="image_holder" t-value="product._get_image_holder()"/>
+                                                      <span t-field="image_holder.image_1920"
+                                                         t-options="{'widget': 'image', 'preview_image': 'image_1024', 'itemprop': 'image'}"
+                                                         sizes="(min-width: 1600px) 367px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" 
+                                                               t-att-alt="product.name" loading="lazy" class="motion-reduce" width="2880" height="2880" 
+                                                         />
+                                                         -->
+                                                   </div>
+                                                </div>
+                                                
+                                             </div>
+                                          </div>
+                                          <div class="card-information">
+                                             <div class="card-information__wrapper">
+                                                <span class="card-information__text h5"><t t-esc="product.name" /></span>
+                                                <span class="caption-large light" />
+                                                <div class="price  price--on-sale ">
+                                                   <dl>
+                                                      <!-- 
+                                                      <div class="price__regular">
+                                                            <dt>
+                                                               <span class="visually-hidden visually-hidden-/-inline">Regular price</span>
+                                                            </dt>
+                                                            <dd>
+                                                               <span class="price-item price-item-/-regular"><t t-esc="product.currency_id.symbol" /><t t-esc="product.list_price" /></span>
+                                                            </dd>
+                                                      </div>
+                                                      -->
+                                                      
+                                                      <div class="price__sale">
+                                                      <t t-if="product.regular_price">
+                                                         <dt class="price__compare">
+                                                            <span class="visually-hidden visually-hidden--inline">Regular price</span>
+                                                         </dt>
+                                                         <dd class="price__compare">
+                                                            <s class="price-item price-item--regular">
+                                                            
+                                                               <t t-esc="product.currency_id.symbol" />
+                                                               <t t-esc="product.regular_price" />
+                                                            </s>
+                                                         </dd>
+                                                      </t>
+
+                                                         <dt>
+                                                            <span class="visually-hidden visually-hidden--inline">Sale price</span>
+                                                         </dt>
+                                                         <dd>
+                                                            <span class="price-item price-item--sale">
+                                                               <t t-if="product.product_variant_count &gt; 1">
+                                                                  From 
+                                                                  <t t-esc="product.currency_id.symbol" />
+                                                                  <t t-esc="product.list_price" />
+                                                               </t>
+                                                               <t t-else="">
+                                                                  <t t-esc="product.currency_id.symbol" />
+                                                                  <t t-esc="product.list_price" />
+                                                               </t>
+                                                            </span>
+                                                         </dd>
+                                                      </div>
+                                                      <small class="unit-price caption hidden">
+                                                         <dt class="visually-hidden">Unit price</dt>
+                                                         <dd>
+                                                            <span />
+                                                            <span aria-hidden="true">/</span>
+                                                            <span class="visually-hidden"> per </span>
+                                                            <span />
+                                                         </dd>
+                                                      </small>
+                                                   </dl>
+                                                </div>
+                                                
+                                             </div>
+                                          </div>
+                                       </a>
+                                    </div>
+                                 
+                                 </li>
+                                 
+                              </t>
+                          </ul>
+                      </slider-component>
+                      <div class="center">
+                          <a t-att-href="item.get_category_url()"  class="button home-link" style="text-decoration: none;" aria-label="View all products in this collection">View all</a>
+                      </div>
+                    </div>
+                  </section>
+
+                  </t>
+         </template>
+
+
+       <template id="4_random_products" name="Products You May Like">
+                  <t t-set="products" t-value="garden_config.get_random_4_products()" />
+                  <section id="shopify-section-template--15058976768185__featured_products" class="shopify-section spaced-section">
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-card.css?v=9252431989618201249" rel="stylesheet" type="text/css" media="all" />
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-price.css?v=18355640432874979228" rel="stylesheet" type="text/css" media="all" />
+                     <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-product-grid.css?v=5354882172846634645" rel="stylesheet" type="text/css" media="all" />
+                     <link rel="stylesheet" href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-slider.css?v=8200683548770782072" media="all" onload="this.media='all'" />
+                     <link rel="stylesheet" href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/template-collection.css?v=6595738038178392633" media="all" onload="this.media='all'" />
+                     <noscript>
+                        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-slider.css?v=8200683548770782072" rel="stylesheet" type="text/css" media="all" />
+                     </noscript>
+                     <noscript>
+                        <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/template-collection.css?v=6595738038178392633" rel="stylesheet" type="text/css" media="all" />
+                     </noscript>
+                     <div class="collection page-width">
+                        <div class="title-wrapper-with-link">
+                           <h2 class="title">You may also like</h2>
+                        </div>
+                        <slider-component class="slider-mobile-gutter">
+                           <ul class="grid grid--2-col product-grid grid--2-col-tablet grid--4-col-desktop negative-margin--small" role="list">
+                              <t t-foreach="products" t-as="product">
+                                 <li class="grid__item">
+                                    <!-- <t t-set="product_href" t-value="/shop" /> t-att-href="/shop" -->
+                                    <link href="//cdn.shopify.com/s/files/1/0600/5473/2985/t/2/assets/component-rating.css?v=2457308526394124043" rel="stylesheet" type="text/css" media="all" />
+                                    <div class="card-wrapper">
+                                       <a t-att-href="product.website_url" class="full-unstyled-link" style="text-decoration: none;">
+                                          <span class="visually-hidden"><t t-esc="product.name" /></span>
+                                           
+                                          <div class="card card--product card--outline" tabindex="-1">
+                                             <div class="card__inner">
+                                                <div>
+                                                   <div class="media media--transparent media--square media--hover-effect">
+                                                      <!--
+                                                         <img srcset="//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_165x.png?v=1642158488 165w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_360x.png?v=1642158488 360w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_533x.png?v=1642158488 533w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_720x.png?v=1642158488 720w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_940x.png?v=1642158488 940w,//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_1066x.png?v=1642158488 1066w" src="//cdn.shopify.com/s/files/1/0600/5473/2985/products/82_533x.png?v=1642158488" sizes="(min-width: 1600px) 367px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" alt="My Dearest" loading="lazy" class="motion-reduce" width="2160" height="2160" />
+                                                      -->
+                                                      
+                                                         <img t-attf-src="/web/image/product.template/#{product.id}/image_1024" sizes="(min-width: 1600px) 367px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" alt="My Dearest" loading="lazy" class="motion-reduce" width="2160" height="2160" />
+
+                                                      <!--
+                                                      <t t-set="image_holder" t-value="product._get_image_holder()"/>
+                                                      <span t-field="image_holder.image_1920"
+                                                         t-options="{'widget': 'image', 'preview_image': 'image_1024', 'itemprop': 'image'}"
+                                                         sizes="(min-width: 1600px) 367px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" 
+                                                               t-att-alt="product.name" loading="lazy" class="motion-reduce" width="2880" height="2880" 
+                                                         />
+                                                         -->
+                                                   </div>
+                                                </div>
+                                                
+                                             </div>
+                                          </div>
+                                          <div class="card-information">
+                                             <div class="card-information__wrapper">
+                                                <span class="card-information__text h5"><t t-esc="product.name" /></span>
+                                                <span class="caption-large light" />
+                                                <div class="price  price--on-sale ">
+                                                   <dl>
+                                                      <!-- 
+                                                      <div class="price__regular">
+                                                            <dt>
+                                                               <span class="visually-hidden visually-hidden-/-inline">Regular price</span>
+                                                            </dt>
+                                                            <dd>
+                                                               <span class="price-item price-item-/-regular"><t t-esc="product.currency_id.symbol" /><t t-esc="product.list_price" /></span>
+                                                            </dd>
+                                                      </div>
+                                                      -->
+                                                      
+                                                      <div class="price__sale">
+                                                      <t t-if="product.regular_price">
+                                                         <dt class="price__compare">
+                                                            <span class="visually-hidden visually-hidden--inline">Regular price</span>
+                                                         </dt>
+                                                         <dd class="price__compare">
+                                                            <s class="price-item price-item--regular">
+                                                            
+                                                               <t t-esc="product.currency_id.symbol" />
+                                                               <t t-esc="product.regular_price" />
+                                                            </s>
+                                                         </dd>
+                                                      </t>
+
+                                                         <dt>
+                                                            <span class="visually-hidden visually-hidden--inline">Sale price</span>
+                                                         </dt>
+                                                         <dd>
+                                                            <span class="price-item price-item--sale">
+                                                               <t t-if="product.product_variant_count &gt; 1">
+                                                                  From 
+                                                                  <t t-esc="product.currency_id.symbol" />
+                                                                  <t t-esc="product.list_price" />
+                                                               </t>
+                                                               <t t-else="">
+                                                                  <t t-esc="product.currency_id.symbol" />
+                                                                  <t t-esc="product.list_price" />
+                                                               </t>
+                                                            </span>
+                                                         </dd>
+                                                      </div>
+                                                      <small class="unit-price caption hidden">
+                                                         <dt class="visually-hidden">Unit price</dt>
+                                                         <dd>
+                                                            <span />
+                                                            <span aria-hidden="true">/</span>
+                                                            <span class="visually-hidden"> per </span>
+                                                            <span />
+                                                         </dd>
+                                                      </small>
+                                                   </dl>
+                                                </div>
+                                                
+                                             </div>
+                                          </div>
+                                       </a>
+                                    </div>
+                                 
+                                 </li>
+                                 
+                              </t>
+                          </ul>
+                      </slider-component>
+                    </div>
+                  </section>
+
+         </template>
+
+
+      <template id="4_random_products_show" inherit_id="website_sale.product" priority="100" active="True" customize_show="True" name="Products You May like">
+         <xpath expr="//div[@id='wrap']/section[1]" position="after">
+               <t t-call="theme_garden.4_random_products" />
+         </xpath>
+      </template>
+
+      <template id="featured_collection_show" inherit_id="website_sale.product" priority="200" active="True" customize_show="True" name="Show Featured Collection">
+         <xpath expr="//div[@id='wrap']/section[1]" position="after">
+               <t t-call="theme_garden.featured_collection" />
+         </xpath>
+      </template>
+
+      
+</odoo>
+
+
+
+
+
+
+
+
+
+
+
