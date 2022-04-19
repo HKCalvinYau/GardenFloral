@@ -26,15 +26,9 @@ html, body, #wrapwrap {
 }
 
 #o-carousel-product .carousel-outer {
-  height: 881.9px;
-  max-height: 210vh; 
-}
-
-
-#o-carousel-product .carousel-outer .carousel-inner img {
-  height: 100%;
-  width: 906.29px;
-  object-fit: cover;
+    height: 400px;
+    max-height: 90vh;
+    margin-bottom: 10px;
 }
 
 .o_footer a:not(.btn) {
